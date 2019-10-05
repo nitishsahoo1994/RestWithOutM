@@ -21,7 +21,7 @@ def get_all():
 
 def create_resource():
     new_emp={
-        'eno':502,
+        'eno':503,
         'ename':'jay Sharma',
         'esal':19.25,
         'eaddr':'Kedarnath',
