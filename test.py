@@ -29,4 +29,14 @@ def create_resource():
     resp=requests.post(BASE_URI+ENDPOINT,data=json.dumps(new_emp))
     print(resp.status_code)
     print(resp.json())
-create_resource()
+
+def update_resource(id):
+    smthng={
+        'esal':8000,
+        'eaddr':'Kashi Biswanath'
+    }
+    resp=requests.put(BASE_URI+ENDPOINT+str(id)+'/',data=json.dumps(smthng))
+    print(resp.status_code)
+    print(resp.json())
+
+update_resource(8)
