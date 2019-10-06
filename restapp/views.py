@@ -11,28 +11,6 @@ from restapp.utils import is_json
 from restapp.forms import EmployeeForm
 
 
-@method_decorator(csrf_exempt,name='dispatch')
-class EmployeeListCBV(HttpResponseMixin,SerializeMixin,View):
-    def get(self,request,*args,**kwargs):
-        qs=Employee.objects.all()
-        json_data=self.serialize(qs)
-        return HttpResponse(json_data,content_type='application/json')
-    def post(self,request,*args,**kwargs):
-        data=request.body
-        valid_json=is_json(data)
-        if not valid_json:
-            json_data=json.dumps({'msg':'This is not valid json data'})
-            return self.render_to_http_response(json_data, status=400)
-        emp_data=json.loads(data)
-        form=EmployeeForm(emp_data)
-        if form.is_valid():
-            form.save(commit=True)
-            json_data=json.dumps({'msg':'Resource Created Successfully'})
-            return self.render_to_http_response(json_data,status=200)
-        if form.errors:
-            json_data=json.dumps(form.errors)
-            return self.render_to_http_response(json_data, status=400)
-
 
 @method_decorator(csrf_exempt,name='dispatch')
 class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin,View):
