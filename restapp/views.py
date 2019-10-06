@@ -10,70 +10,6 @@ from django.utils.decorators import method_decorator
 from restapp.utils import is_json
 from restapp.forms import EmployeeForm
 
-@method_decorator(csrf_exempt,name='dispatch')
-class EmployeeDetailCBV(HttpResponseMixin,SerializeMixin,View):
-    def get_object_by_id(self,id):
-        try:
-            emp=Employee.objects.get(id=id)
-        except Employee.DoesNotExist:
-            emp=None
-        return emp
-
-    def get(self,request,id,*args,**kwargs):
-        try:
-            emp = Employee.objects.get(id=id)
-        except Employee.DoesNotExist:
-            json_data=json.dumps({'msg':'This Value doesn\'t exit'})
-            return self.render_to_http_response(json_data,status=400)
-        else:
-            json_data = self.serialize([emp, ])
-            return self.render_to_http_response(json_data,status=200)
-
-    def put(self, request, id, *args, **kwargs):
-        emp = self.get_object_by_id(id)
-        if emp is None:
-            json_data = json.dumps({'msg': 'This data doesn\'t exit'})
-            return self.render_to_http_response(json_data, status=400)
-        data = request.body
-        valid_json = is_json(data)
-        if not valid_json:
-            json_data = json.dumps({'msg': 'Upadates data is not valid'})
-            return self.render_to_http_response(json_data, status=400)
-        update_list = json.loads(data)
-        origional_list = {
-            'eno': emp.eno,
-            'ename': emp.ename,
-            'esal': emp.esal,
-            'eaddr': emp.eaddr,
-        }
-        origional_list.update(update_list)
-        form = EmployeeForm(origional_list,instance=emp)
-        if form.is_valid:
-            form.save(commit=True)
-            json_data = json.dumps({'msg': 'Resource update Successfully'})
-            return self.render_to_http_response(json_data)
-        if form.errors:
-            json_data = json.dumps(form.error)
-            return self.render_to_http_response(json_data, status=400)
-    # def delete(self,request,id,*args,**kwargs):
-    #     emp=self.get_object_by_id(id)
-    #     if emp is None:
-    #         json_data = json.dumps({'msg': 'This data doesn\'t exit'})
-    #         return self.render_to_http_response(json_data, status=400)
-    #
-    #     status,deleted_item=emp.delete()
-    #     print(status)
-    #     if status==1:
-    #         json_data=json.dumps({'msg','Resource deleted Succcessfully'})
-    #         return self.render_to_http_response(json_data)
-    #     json_data = json.dumps({'msg', 'Unable to delete'})
-    #     return self.render_to_http_response(json_data,status=400)
-
-
-
-
-
-
 
 @method_decorator(csrf_exempt,name='dispatch')
 class EmployeeListCBV(HttpResponseMixin,SerializeMixin,View):
@@ -174,7 +110,24 @@ class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin,View):
             json_data = json.dumps(form.errors)
             return self.render_to_http_response(json_data,status=404)
 
-
-
-
-
+    def delete(self,request,*args,**kwargs):
+        data = request.body
+        valid_json = is_json(data)
+        if not valid_json:
+            json_data = json.dumps({'msg': 'This is not a valid Json'})
+            return self.render_to_http_response(json_data, status=404)
+        pdata = json.loads(data)
+        id = pdata.get('id', None)
+        if id is not None:
+            emp = self.get_object_by_id(id)
+            if emp is None:
+                json_data = json.dumps({'msg': 'The request resource is not avialable with matched id:'})
+                return self.render_to_http_response(json_data, status=404)
+            status,deleted_items=emp.delete()
+            if status==1:
+                json_data=json.dumps({'msg':"Deleted successfully"})
+                return self.render_to_http_response(json_data)
+            json_data=json.dumps({'msg':'Unable to delete..plz try again'})
+            return  self.render_to_http_response(json_data,status=400)
+        json_data = json.dumps({'msg': 'To perform delete operation id is mandatory'})
+        return self.render_to_http_response(json_data, status=400)

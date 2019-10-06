@@ -32,7 +32,16 @@ def update_resource(id):
     resp=requests.put(BASE_URI+ENDPOINT,data=json.dumps(new_emp))
     print(resp.status_code)
     print(resp.json())
-update_resource(11)
+
+def delete_resoure(id):
+    data={
+        'id':id
+    }
+    resp=requests.delete(BASE_URI+ENDPOINT,data=json.dumps(data))
+    print(resp.status_code)
+    print(resp.json())
+delete_resoure(11)
+
 
 
 

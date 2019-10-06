@@ -19,7 +19,6 @@ from restapp import views
 
 urlpatterns = [
     url('admin/', admin.site.urls),
-url(r'^api/(?P<id>\d+)/$', views.EmployeeDetailCBV.as_view()),
-url(r'^api/', views.EmployeeCRUDCBV.as_view()),
+    url(r'^api/', views.EmployeeCRUDCBV.as_view()),
 
 ]
