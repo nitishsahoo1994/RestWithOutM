@@ -47,7 +47,7 @@ class EmployeeDetailCBV(HttpResponseMixin,SerializeMixin,View):
             'eaddr': emp.eaddr,
         }
         origional_list.update(update_list)
-        form = EmployeeForm(origional_list)
+        form = EmployeeForm(origional_list,instance=emp)
         if form.is_valid:
             form.save(commit=True)
             json_data = json.dumps({'msg': 'Resource update Successfully'})
@@ -96,3 +96,85 @@ class EmployeeListCBV(HttpResponseMixin,SerializeMixin,View):
         if form.errors:
             json_data=json.dumps(form.errors)
             return self.render_to_http_response(json_data, status=400)
+
+
+@method_decorator(csrf_exempt,name='dispatch')
+class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin,View):
+    def get_object_by_id(self,id):
+        try:
+            emp=Employee.objects.get(id=id)
+        except Employee.DoesNotExist:
+            emp=None
+        return emp
+
+    def get(self,request,*args,**kwargs):
+        data=request.body
+        valid_json=is_json(data)
+        if not valid_json:
+            json_data=json.dumps({'msg','This is not a valid Json'})
+            return self.render_to_http_response(json_data,status=404)
+        pdata=json.loads(data)
+        id=pdata.get('id',None)
+        if id is not None:
+            emp=self.get_object_by_id(id)
+            if emp is None:
+                json_data = json.dumps({'msg', 'The request resource is not avialable with matched id:'})
+                return self.render_to_http_response(json_data, status=404)
+            json_data=self.serialize([emp,])
+            return self.render_to_http_response(json_data)
+        qs=Employee.objects.all()
+        json_data = self.serialize(qs)
+        return self.render_to_http_response(json_data)
+
+    def post(self,request,*args,**kwargs):
+        data=request.body
+        valid_json=is_json(data)
+        if not valid_json:
+            json_data=json.dumps({'msg':'This is not a valid Json Data'})
+            return self.render_to_http_response(json_data,status=404)
+        emp_data=json.loads(data)
+        form=EmployeeForm(emp_data)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data = json.dumps({'msg': 'Resource Submitted Successfully'})
+            return self.render_to_http_response(json_data)
+        if form.errors:
+            json_data = json.dumps(form.errors)
+            return self.render_to_http_response(json_data,status=404)
+
+    def put(self,request,*args,**kwargs):
+        data=request.body
+        valid_json=is_json(data)
+        if not valid_json:
+            json_data = json.dumps({'msg', 'This is not a valid Json'})
+            return self.render_to_http_response(json_data, status=404)
+        pdata=json.loads(data)
+        id=pdata.get('id',None)
+        if id is None:
+            json_data = json.dumps({'msg', 'To perform updation id is mandatory,Please provide id'})
+            return self.render_to_http_response(json_data, status=404)
+        emp=self.get_object_by_id(id)
+        if emp is None:
+            json_data = json.dumps({'msg', 'The request source is not avialable with matched id:,Please provide valid id'})
+            return self.render_to_http_response(json_data, status=404)
+        update_data=json.loads(data)
+        origional_data={
+            'eno':emp.eno,
+            'ename': emp.ename,
+            'esal': emp.esal,
+            'eaddr': emp.eaddr,
+        }
+        origional_data.update(update_data)
+        form=EmployeeForm(origional_data,instance=emp)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data=json.dumps({'msg','Updation is Success'})
+            return self.render_to_http_response(json_data)
+        if form.errors:
+            json_data = json.dumps(form.errors)
+            return self.render_to_http_response(json_data,status=404)
+
+
+
+
+
