@@ -32,11 +32,15 @@ def create_resource():
 
 def update_resource(id):
     smthng={
-        'esal':8000,
-        'eaddr':'Kashi Biswanath'
+        'esal':180,
+        'eaddr':'Puri'
     }
     resp=requests.put(BASE_URI+ENDPOINT+str(id)+'/',data=json.dumps(smthng))
     print(resp.status_code)
     print(resp.json())
+update_resource(9)
 
-update_resource(8)
+# def delete_resource(id):
+#     resp=requests.delete(BASE_URI+ENDPOINT+str(id)+'/')
+#     print(resp.status_code)
+#     print(resp.json())

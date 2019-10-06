@@ -18,6 +18,7 @@ class EmployeeDetailCBV(HttpResponseMixin,SerializeMixin,View):
         except Employee.DoesNotExist:
             emp=None
         return emp
+
     def get(self,request,id,*args,**kwargs):
         try:
             emp = Employee.objects.get(id=id)
@@ -28,33 +29,45 @@ class EmployeeDetailCBV(HttpResponseMixin,SerializeMixin,View):
             json_data = self.serialize([emp, ])
             return self.render_to_http_response(json_data,status=200)
 
-    def put(self,request,id,*args,**kwargs):
-        emp=self.get_object_by_id(id)
+    def put(self, request, id, *args, **kwargs):
+        emp = self.get_object_by_id(id)
         if emp is None:
-            json_data=json.dumps({'msg':'This data doesn\'t exit'})
-            return self.render_to_http_response(json_data,status=400)
-        data=request.body
-        valid_json=is_json(data)
+            json_data = json.dumps({'msg': 'This data doesn\'t exit'})
+            return self.render_to_http_response(json_data, status=400)
+        data = request.body
+        valid_json = is_json(data)
         if not valid_json:
             json_data = json.dumps({'msg': 'Upadates data is not valid'})
             return self.render_to_http_response(json_data, status=400)
-        update_list=json.loads(data)
-        origional_list={
-            'eno':emp.eno,
+        update_list = json.loads(data)
+        origional_list = {
+            'eno': emp.eno,
             'ename': emp.ename,
             'esal': emp.esal,
             'eaddr': emp.eaddr,
         }
         origional_list.update(update_list)
-        form=EmployeeForm(origional_list)
+        form = EmployeeForm(origional_list)
         if form.is_valid:
             form.save(commit=True)
             json_data = json.dumps({'msg': 'Resource update Successfully'})
             return self.render_to_http_response(json_data)
         if form.errors:
             json_data = json.dumps(form.error)
-            return self.render_to_http_response(json_data,status=400)
-
+            return self.render_to_http_response(json_data, status=400)
+    # def delete(self,request,id,*args,**kwargs):
+    #     emp=self.get_object_by_id(id)
+    #     if emp is None:
+    #         json_data = json.dumps({'msg': 'This data doesn\'t exit'})
+    #         return self.render_to_http_response(json_data, status=400)
+    #
+    #     status,deleted_item=emp.delete()
+    #     print(status)
+    #     if status==1:
+    #         json_data=json.dumps({'msg','Resource deleted Succcessfully'})
+    #         return self.render_to_http_response(json_data)
+    #     json_data = json.dumps({'msg', 'Unable to delete'})
+    #     return self.render_to_http_response(json_data,status=400)
 
 
 
