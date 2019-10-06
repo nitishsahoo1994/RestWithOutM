@@ -66,37 +66,3 @@ update_resource(11)
 
 
 
-# def get_all():
-#     resp=requests.get(BASE_URI+ENDPOINT)
-#     print(resp.status_code)
-#     print(resp.json())
-#
-# # get_all()
-#
-# def create_resource():
-#     new_emp={
-#         'eno':503,
-#         'ename':'jay Sharma',
-#         'esal':19.25,
-#         'eaddr':'Kedarnath',
-#     }
-#     resp=requests.post(BASE_URI+ENDPOINT,data=json.dumps(new_emp))
-#     print(resp.status_code)
-#     print(resp.json())
-#
-# def update_resource(id):
-#     def delete_resource(id):
-#         resp = requests.delete(BASE_URI + ENDPOINT + str(id) + '/')
-#         print(resp.status_code)
-#         print(resp.json())
-#
-#     smthng={
-#         'esal':180,
-#         'eaddr':'Puri'
-#     }
-#     resp=requests.put(BASE_URI+ENDPOINT+str(id)+'/',data=json.dumps(smthng))
-#     print(resp.status_code)
-#     print(resp.json())
-# update_resource(9)
-
-
